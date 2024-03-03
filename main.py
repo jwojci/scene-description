@@ -52,6 +52,7 @@ def main():
     # todo Add token splitter if object_locations is too long (todo in nlp_func)
     # todo add input for other peoples api key
     # todo ? maybe add a button Wrong description, to give the model a chance to interpret the information one more time
+
     setup_logger()
 
     predictor = load_predictor()
