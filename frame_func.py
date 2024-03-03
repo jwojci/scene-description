@@ -4,7 +4,6 @@ import cv2
 import streamlit as st
 
 
-@st.cache_resource
 def get_vid(file_path):
     return cv2.VideoCapture(file_path)
 
