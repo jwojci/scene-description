@@ -3,7 +3,7 @@ openai==1.13.3
 opencv_python==4.9.0.80
 python-dotenv==1.0.1
 streamlit==1.31.1
-torch
-torchvision
+torch==2.1.2
+torchvision==0.16.2
 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.10/index.html
 detectron2
