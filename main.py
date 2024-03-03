@@ -72,7 +72,7 @@ def main():
         st.video(sample_video_path)
         generate_button = st.button("Generate description", use_container_width=True)
         if generate_button:
-            with st.spinner("In progress...):
+            with st.spinner("In progress..."):
                 process(sample_video_path, cfg, predictor)
 
 
