@@ -30,16 +30,16 @@ def load_predictor():
 
 
 @st.cache_data
-def process(video_path, predictor):
+def process(video_path, _predictor):
     vid = frame_func.get_vid(video_path)
 
     duration = frame_func.get_vid_duration(vid)
     if duration > 13:
         st.warning("The uploaded video must be 13 seconds or less.")
         sys.exit()
-    metadata = frame_func.get_metadata(predictor.cfg)
+    metadata = frame_func.get_metadata(_predictor.cfg)
     thing_category_names, stuff_category_names = frame_func.get_labels(metadata)
-    object_locations = frame_func.process_vid(vid, predictor, thing_category_names, stuff_category_names,
+    object_locations = frame_func.process_vid(vid, _predictor, thing_category_names, stuff_category_names,
                                               every_num_frames=10)
     background_detections, objects = nlp_func.get_background_foreground(object_locations)
     background_content, foreground_content = nlp_func.get_gpt_prompt(background_detections, objects)
