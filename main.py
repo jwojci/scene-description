@@ -16,20 +16,36 @@ def write_bytesio_to_file(filename, bytesio):
         outfile.write(bytesio.getbuffer())
 
 
-def process(video_path, cfg, predictor):
+@st.cache_resource
+def load_predictor():
+    # Detectron2 Config
+    cfg = get_cfg()
+    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
+    cfg.MODEL.DEVICE = "cpu"
+    # Init predictor
+
+    return DefaultPredictor(cfg)
+
+
+@st.cache_data
+def process(video_path, predictor):
     vid = frame_func.get_vid(video_path)
 
     duration = frame_func.get_vid_duration(vid)
     if duration > 13:
         st.warning("The uploaded video must be 13 seconds or less.")
         sys.exit()
-    metadata = frame_func.get_metadata(cfg)
+    metadata = frame_func.get_metadata(predictor.cfg)
     thing_category_names, stuff_category_names = frame_func.get_labels(metadata)
-    object_locations = frame_func.process_vid(vid, predictor, thing_category_names, stuff_category_names, every_num_frames=10)
+    object_locations = frame_func.process_vid(vid, predictor, thing_category_names, stuff_category_names,
+                                              every_num_frames=10)
     background_detections, objects = nlp_func.get_background_foreground(object_locations)
     background_content, foreground_content = nlp_func.get_gpt_prompt(background_detections, objects)
     description = nlp_func.get_description(background_content, foreground_content)
-    st.write_stream(description)
+
+    return description
 
 
 def main():
@@ -38,14 +54,7 @@ def main():
     # todo ? maybe add a button Wrong description, to give the model a chance to interpret the information one more time
     setup_logger()
 
-    # Detectron2 Config
-    cfg = get_cfg()
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"))
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
-    cfg.MODEL.DEVICE = "cpu"
-    # Init predictor
-    predictor = DefaultPredictor(cfg)
+    predictor = load_predictor()
 
     st.title("Scene description generation")
     st.header("Upload video or choose sample")
@@ -65,13 +74,13 @@ def main():
             if generate_button:
                 # save uploaded video to disc
                 write_bytesio_to_file(temp_file_to_save, uploaded)
-                process(temp_file_to_save, cfg, predictor)
+                process(temp_file_to_save, predictor)
     elif video_choice in sample_videos:
         sample_video_path = os.path.join("samples", video_choice)
         st.video(sample_video_path)
         generate_button = st.button("Generate description", use_container_width=True)
         if generate_button:
-            process(sample_video_path, cfg, predictor)
+            process(sample_video_path, predictor)
 
 
 if __name__ == "__main__":

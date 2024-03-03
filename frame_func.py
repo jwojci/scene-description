@@ -1,8 +1,10 @@
 import numpy as np
 from detectron2.data import MetadataCatalog
 import cv2
+import streamlit as st
 
 
+@st.cache_data
 def get_vid(file_path):
     return cv2.VideoCapture(file_path)
 
@@ -15,10 +17,12 @@ def get_vid_duration(vid):
     return duration
 
 
+@st.cache_data
 def get_metadata(cfg):
     return MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
 
 
+@st.cache_data
 def get_labels(metadata):
     thing_category_names = metadata.thing_classes
     stuff_category_names = metadata.stuff_classes

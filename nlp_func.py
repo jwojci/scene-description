@@ -3,6 +3,8 @@ import os
 from openai import OpenAI
 import streamlit as st
 
+
+@st.cache_resource
 def get_gpt_client():
     client = OpenAI(api_key=st.secrets["open_ai_key"])
     return client
