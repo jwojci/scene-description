@@ -1,11 +1,9 @@
 import os
-from dotenv import load_dotenv
 
 from openai import OpenAI
 import streamlit as st
 
 def get_gpt_client():
-    load_dotenv()
     client = OpenAI(api_key=st.secrets["open_ai_key"])
     return client
 
