@@ -29,7 +29,8 @@ def process(video_path, cfg, predictor):
     background_detections, objects = nlp_func.get_background_foreground(object_locations)
     background_content, foreground_content = nlp_func.get_gpt_prompt(background_detections, objects)
     description = nlp_func.get_description(background_content, foreground_content)
-    st.write_stream(description)
+
+    return description
 
 
 def main():
@@ -66,15 +67,16 @@ def main():
                 # save uploaded video to disc
                 write_bytesio_to_file(temp_file_to_save, uploaded)
                 with st.spinner("In progress..."):
-                    process(temp_file_to_save, cfg, predictor)
+                    stream = process(temp_file_to_save, cfg, predictor)
+                st.write_stream(stream)            
     elif video_choice in sample_videos:
         sample_video_path = os.path.join("samples", video_choice)
         st.video(sample_video_path)
         generate_button = st.button("Generate description", use_container_width=True)
         if generate_button:
             with st.spinner("In progress..."):
-                process(sample_video_path, cfg, predictor)
-
+                stream = process(sample_video_path, cfg, predictor)
+            st.write_stream(stream)
 
 if __name__ == "__main__":
     main()
