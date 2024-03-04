@@ -74,14 +74,16 @@ def main():
             if generate_button:
                 # save uploaded video to disc
                 write_bytesio_to_file(temp_file_to_save, uploaded)
-                stream = process(temp_file_to_save, predictor)
+                with st.spinner("In progress"):
+                    stream = process(temp_file_to_save, predictor)
                 st.write_stream(stream)
     elif video_choice in sample_videos:
         sample_video_path = os.path.join("samples", video_choice)
         st.video(sample_video_path)
         generate_button = st.button("Generate description", use_container_width=True)
         if generate_button:
-            stream = process(sample_video_path, predictor)
+            with st.spinner("In progress..."):
+                stream = process(sample_video_path, predictor)
             st.write_stream(stream)
 
 
