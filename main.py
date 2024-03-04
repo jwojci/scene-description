@@ -29,7 +29,6 @@ def load_predictor():
     return DefaultPredictor(cfg)
 
 
-@st.cache_resource
 def process(video_path, _predictor):
     vid = frame_func.get_vid(video_path)
 
